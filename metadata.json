@@ -1,0 +1,6 @@
+{
+  "name": "ଓଡ଼ିଆ ସାହିତ୍ୟ ଓ କବି ମଞ୍ଜୁଷା",
+  "description": "ଓଡ଼ିଆ ଭାଷା, ସାହିତ୍ୟ, ପ୍ରସିଦ୍ଧ କବି, ଔପନ୍ୟାସିକ, ଗାଳ୍ପିକ, କାଳଜୟୀ କବିତା ଓ ଉପନ୍ୟାସର ସମୃଦ୍ଧ ସଂଗ୍ରହ ଓ ପଠନ ଆପ୍ ।",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
