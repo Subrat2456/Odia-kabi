@@ -8,10 +8,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "node --check app.js data.js data_ancient.js data_modern.js data_post_independence.js data_contemporary.js vite.config.js"
+    "lint": "node -e 'const fs=require(\"fs\"); const h=fs.readFileSync(\"index.html\",\"utf8\"); const js=h.match(/<script type=\"module\">([\\s\\S]*?)<\\/script>/)[1]; new Function(js); console.log(\"Single-file applet validated OK\");'"
   },
   "dependencies": {
     "vite": "^8.3.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
 }
