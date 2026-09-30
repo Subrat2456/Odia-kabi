@@ -460,7 +460,48 @@ input{font-family:inherit}
   transition:.25s;white-space:nowrap;
 }
 .toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ============ POET PROFILE MODAL ============ */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(20,16,13,0.65);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  z-index:998;opacity:0;pointer-events:none;transition:opacity .25s ease;
+}
+.modal-backdrop.show{opacity:1;pointer-events:auto}
+.profile-modal{
+  position:fixed;left:50%;bottom:0;transform:translate(-50%,105%);
+  width:100%;max-width:530px;max-height:88vh;
+  background:var(--surface);border-radius:22px 22px 0 0;
+  box-shadow:0 -10px 40px rgba(0,0,0,.28);
+  display:flex;flex-direction:column;z-index:999;
+  transition:transform .32s cubic-bezier(0.2,0.9,0.3,1);
+  overflow:hidden;border:1px solid var(--border);border-bottom:none;
+}
+.profile-modal.show{transform:translate(-50%,0)}
+.modal-header{
+  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;
+}
+.modal-poet-meta{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+.modal-poet-info{min-width:0;flex:1}
+.modal-poet-title{margin:0;font-size:16.5px;font-weight:700;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal-poet-sub{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal-close-btn{
+  width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  font-size:22px;line-height:1;background:var(--surface);border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:transform .15s;flex-shrink:0;
+}
+.modal-close-btn:active{transform:scale(.92)}
+.scrollable-modal-body{
+  flex:1;overflow-y:auto;padding:14px 16px 20px;-webkit-overflow-scrolling:touch;
+}
+.modal-box{margin-bottom:10px}
+.modal-footer{
+  padding:12px 16px;border-top:1px solid var(--border);
+  display:flex;gap:10px;justify-content:flex-end;background:var(--surface2);flex-shrink:0;
+}
 </style>
+<link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
@@ -777,6 +818,28 @@ input{font-family:inherit}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7.5 8.5 4.5-4.5 4.5 4.5"/><path d="M5 14v5.5h14V14"/></svg>
       ବାଣ୍ଟନ୍ତୁ
     </button>
+  </div>
+</div>
+
+<!-- ============ POET PROFILE MODAL (5 SPECIFIC FIELDS & DETAILS) ============ -->
+<div class="modal-backdrop" id="profileModalBackdrop"></div>
+<div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="modalPoetName">
+  <div class="modal-header">
+    <div class="modal-poet-meta">
+      <div class="pavatar" id="modalPoetAvatar" style="width:48px;height:48px;font-size:20px;border-radius:14px;box-shadow:var(--shadow)"></div>
+      <div class="modal-poet-info">
+        <h3 id="modalPoetName" class="modal-poet-title"></h3>
+        <div id="modalPoetSubtitle" class="modal-poet-sub"></div>
+      </div>
+    </div>
+    <button class="modal-close-btn" id="modalCloseBtn" aria-label="ବନ୍ଦ କରନ୍ତୁ">&times;</button>
+  </div>
+  <div class="scrollable-modal-body" id="modalBody">
+    <!-- Populated dynamically with upadhi, pradatakari, prasiddha_pustaka, puraskara, likhana_shaili, edition, established_date -->
+  </div>
+  <div class="modal-footer">
+    <button class="btn ghost" id="modalCloseActionBtn">ବନ୍ଦ କରନ୍ତୁ</button>
+    <button class="btn" id="modalReadWorksBtn">କୃତି ଓ ଗ୍ରନ୍ଥାବଳୀ ପଢ଼ନ୍ତୁ</button>
   </div>
 </div>
 

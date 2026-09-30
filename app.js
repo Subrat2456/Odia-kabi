@@ -202,10 +202,153 @@
     });
   }
 
+  /* =========================================================
+     POET PROFILE MODAL (5 SPECIFIC FIELDS & DETAILS)
+     upadhi, pradatakari, prasiddha_pustaka, puraskara, likhana_shaili
+     ========================================================= */
+  function openPoetProfileModal(poetId){
+    const p = DB.poets.find(x => x.id === poetId);
+    if (!p) return;
+
+    const modal = $('#profileModal');
+    const backdrop = $('#profileModalBackdrop');
+    if (!modal || !backdrop) {
+      // Fallback to detailed view if modal element not present
+      openPoetWorks(poetId);
+      return;
+    }
+
+    const avatar = $('#modalPoetAvatar');
+    if (avatar) {
+      avatar.textContent = p.name.charAt(0);
+      avatar.style.background = `linear-gradient(135deg, ${p.color || '#9C3B1B'}, ${p.color || '#9C3B1B'}EE)`;
+    }
+
+    const titleEl = $('#modalPoetName');
+    if (titleEl) {
+      titleEl.innerHTML = `#${toOdia(p.num)} ${esc(p.name)} <span class="ptitle-tag">${esc(p.upadhi || p.title)}</span>`;
+    }
+
+    const subEl = $('#modalPoetSubtitle');
+    if (subEl) {
+      subEl.textContent = `${p.eng_name ? p.eng_name + ' · ' : ''}${p.era} (${p.period || ''})`;
+    }
+
+    const awardsList = Array.isArray(p.puraskara || p.awards)
+      ? (p.puraskara || p.awards)
+      : [p.puraskara || p.awards].filter(Boolean);
+
+    const bodyEl = $('#modalBody');
+    if (bodyEl) {
+      bodyEl.innerHTML = `
+        <!-- 1. UPADHI (ଉପାଧି) -->
+        <div class="profile-feature-box modal-box" style="border-left:4.5px solid var(--primary);margin-top:2px">
+          <div class="pf-title" style="color:var(--primary)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+            ଉପାଧି (Title / Upadhi)
+          </div>
+          <div style="font-size:16px;font-weight:700;color:var(--primary);margin-bottom:3px">
+            ${esc(p.upadhi || p.titles || p.title || 'ବିଶିଷ୍ଟ ସ୍ରଷ୍ଟା')}
+          </div>
+        </div>
+
+        <!-- 2. PRADATAKARI (ଉପାଧି ପ୍ରଦାନକାରୀ) -->
+        <div class="profile-feature-box modal-box" style="border-left:4.5px solid var(--accent)">
+          <div class="pf-title" style="color:var(--accent)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            ଉପାଧି ପ୍ରଦାନକାରୀ (Title Giver / Pradatakari)
+          </div>
+          <div class="pf-value" style="font-size:14px;font-weight:600">
+            ${esc(p.pradatakari || p.title_provider || 'ସାରସ୍ୱତ ସମାଜ ଓ ଓଡ଼ିଶାବାସୀ')}
+          </div>
+        </div>
+
+        <!-- 3. PRASIDDHA PUSTAKA (ପ୍ରସିଦ୍ଧ ପୁସ୍ତକ) -->
+        <div class="profile-feature-box modal-box" style="border-left:4.5px solid var(--gold)">
+          <div class="pf-title" style="color:var(--gold)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M4 19.5V6a2 2 0 0 1 2-2h11.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M20 17V4.5A1.5 1.5 0 0 0 18.5 3H6.5A2.5 2.5 0 0 0 4 5.5"/></svg>
+            ପ୍ରସିଦ୍ଧ ପୁସ୍ତକ / ଶ୍ରେଷ୍ଠ ଗ୍ରନ୍ଥ (Famous Book / Prasiddha Pustaka)
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">
+            📖 ${esc(p.prasiddha_pustaka || p.famous_book || 'ମୁଖ୍ୟ କାଳଜୟୀ ରଚନାବଳୀ')}
+          </div>
+        </div>
+
+        <!-- 4. LIKHANA SHAILI (ଲେଖନ ଶୈଳୀ) -->
+        <div class="profile-feature-box modal-box" style="border-left:4.5px solid #2B6CB0">
+          <div class="pf-title" style="color:#2B6CB0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            ଲେଖନ ଶୈଳୀ ଓ ସାହିତ୍ୟିକ ବୈଶିଷ୍ଟ୍ୟ (Writing Style / Likhana Shaili)
+          </div>
+          <div class="pf-value" style="font-size:13px;line-height:1.75">
+            ✍️ ${esc(p.likhana_shaili || p.style || 'ମନୋଜ୍ଞ ଓ ସାରଗର୍ଭକ ଶୈଳୀ')}
+          </div>
+        </div>
+
+        <!-- 5. PURASKARA (ପୁରସ୍କାର) -->
+        <div class="profile-feature-box modal-box" style="border-left:4.5px solid #C4541E">
+          <div class="pf-title" style="color:#C4541E">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            ପୁରସ୍କାର ଓ ସମ୍ମାନାବଳୀ (Awards / Puraskara)
+          </div>
+          <div class="pf-value" style="font-size:13px;line-height:1.75">
+            ${awardsList.length
+              ? awardsList.map(a => `<div>🎖️ ${esc(a)}</div>`).join('')
+              : '<div>• ଓଡ଼ିଶାବାସୀଙ୍କ ଶ୍ରଦ୍ଧା ଓ ସାହିତ୍ୟିକ ପ୍ରତିଷ୍ଠା</div>'}
+          </div>
+        </div>
+
+        <!-- 6. EDITION & ESTABLISHED DATE -->
+        <div class="profile-feature-box modal-box" style="border-left:4.5px solid #6B46C1;background:rgba(107,70,193,0.05)">
+          <div class="pf-title" style="color:#6B46C1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            ପ୍ରକାଶନ ସଂସ୍କରଣ ଓ ପ୍ରତିଷ୍ଠା କାଳ (Edition & Established Date)
+          </div>
+          <div style="font-size:13px;line-height:1.75;color:var(--text)">
+            <div><b>📚 ସଂସ୍କରଣ (Edition):</b> ${esc(p.edition || 'ପ୍ରାଚୀନ ତାଳପତ୍ର / ପ୍ରଥମ ମୁଦ୍ରଣ')}</div>
+            <div style="margin-top:3px"><b>⏳ ପ୍ରତିଷ୍ଠା କାଳ:</b> ${esc(p.established_date || p.period || 'ଅଜ୍ଞାତ')}</div>
+          </div>
+        </div>
+
+        <!-- 7. BIOGRAPHY & FAMILY -->
+        ${p.bio ? `
+          <div class="card" style="margin:10px 0 4px;padding:13px">
+            <h4 style="margin:0 0 6px;font-size:13.5px;color:var(--primary)">ଜୀବନ ବୃତ୍ତାନ୍ତ (Biography)</h4>
+            ${(p.birth || p.birthplace) ? `<div style="font-size:12px;color:var(--muted);margin-bottom:4px"><b>ଜନ୍ମ:</b> ${esc(p.birth || p.birthplace)}</div>` : ''}
+            ${p.parents ? `<div style="font-size:12px;color:var(--muted);margin-bottom:6px"><b>ପରିବାର:</b> ${esc(p.parents)}</div>` : ''}
+            <p style="margin:0;font-size:13px;line-height:1.8;color:var(--text)">${esc(p.bio)}</p>
+          </div>
+        ` : ''}
+      `;
+    }
+
+    const readBtn = $('#modalReadWorksBtn');
+    if (readBtn) {
+      readBtn.onclick = () => {
+        closePoetProfileModal();
+        openPoetWorks(p.id);
+      };
+    }
+
+    backdrop.classList.add('show');
+    modal.classList.add('show');
+  }
+
+  function closePoetProfileModal(){
+    const modal = $('#profileModal');
+    const backdrop = $('#profileModalBackdrop');
+    if (modal) modal.classList.remove('show');
+    if (backdrop) backdrop.classList.remove('show');
+  }
+
+  /* =========================================================
+     POET LIST RENDERING (OPTIMIZED WITH DOCUMENT FRAGMENT)
+     Ensures all 92 poets load smoothly without UI blocking
+     ========================================================= */
   function renderPoetsList(){
     const wrap = $('#poetList');
     if (!wrap) return;
-    let list = DB.poets;
+    let list = DB.poets || [];
     if (state.category === 'ancient'){
       list = DB.poets.filter(p => (p.num >= 1 && p.num <= 20) || p.category === 'ancient');
     } else if (state.category === 'modern'){
@@ -220,20 +363,31 @@
       wrap.innerHTML = `<div class="empty">ଏହି ବିଭାଗରେ କୌଣସି କବି ନାହାନ୍ତି ।</div>`;
       return;
     }
-    wrap.innerHTML = list.map((p, idx) => `
-      <div class="poet" data-poet-id="${p.id}">
+
+    wrap.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+
+    list.forEach((p, idx) => {
+      const card = document.createElement('div');
+      card.className = 'poet';
+      card.setAttribute('data-poet-id', p.id);
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('title', `${p.name} - ପରିଚୟ ଦେଖିବାକୁ ଟ୍ୟାପ୍ କରନ୍ତୁ`);
+
+      card.innerHTML = `
         <div class="pavatar" style="background:linear-gradient(135deg,${p.color || '#9C3B1B'},${p.color || '#9C3B1B'}DD)">
           ${esc(p.name.charAt(0))}
         </div>
         <div class="pbody">
           <div class="pname">
             <span class="p-num-badge">#${toOdia(p.num || idx + 1)}</span>
-            ${esc(p.name)} <span class="ptitle-tag">${esc(p.title)}</span>
+            ${esc(p.name)} <span class="ptitle-tag">${esc(p.upadhi || p.title)}</span>
           </div>
 
-          ${p.famous_book ? `
+          ${(p.prasiddha_pustaka || p.famous_book) ? `
             <div>
-              <span class="p-famous-badge">📖 ପ୍ରସିଦ୍ଧ ପୁସ୍ତକ: <strong>${esc(p.famous_book)}</strong></span>
+              <span class="p-famous-badge">📖 ପ୍ରସିଦ୍ଧ ପୁସ୍ତକ: <strong>${esc(p.prasiddha_pustaka || p.famous_book)}</strong></span>
             </div>
           ` : ''}
 
@@ -249,29 +403,32 @@
             </div>
           ` : ''}
 
-          ${p.title_provider ? `
+          ${(p.pradatakari || p.title_provider) ? `
             <div class="p-provider-text">
-              🎖️ ଉପାଧି ପ୍ରଦାତା: <span>${esc(p.title_provider)}</span>
+              🎖️ ଉପାଧି ପ୍ରଦାତା: <span>${esc(p.pradatakari || p.title_provider)}</span>
             </div>
           ` : ''}
 
-          ${p.style ? `
+          ${(p.likhana_shaili || p.style) ? `
             <div class="p-style-text">
-              ✍️ ଶୈଳୀ: <span>${esc(p.style.slice(0, 80))}...</span>
+              ✍️ ଶୈଳୀ: <span>${esc((p.likhana_shaili || p.style).slice(0, 80))}...</span>
             </div>
           ` : ''}
 
-          <div class="pmeta">${esc(p.era)} · ${toOdia(p.works ? p.works.length : 0)} ଟି କୃତି</div>
+          <div class="pmeta">${esc(p.era)} · ${toOdia(p.works ? p.works.length : 0)} ଟି କୃତି · <span>ଟ୍ୟାପ୍: ପରିଚୟ ମୋଡାଲ୍</span></div>
         </div>
         <div class="arrow">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
         </div>
-      </div>
-    `).join('');
+      `;
 
-    $$('#poetList .poet').forEach(el => {
-      el.onclick = () => openPoetWorks(el.dataset.poetId);
+      // Tap opens the rich Profile Modal cleanly with all 5 fields
+      card.onclick = () => openPoetProfileModal(p.id);
+
+      fragment.appendChild(card);
     });
+
+    wrap.appendChild(fragment);
   }
 
   function renderBhashaSection(){
@@ -289,7 +446,9 @@
   }
 
   /* =========================================================
-     POET PROFILE & WORKS VIEW (ସ୍ରଷ୍ଟା ପରିଚୟ, ଉପାଧି, ସଂସ୍କରଣ, ପ୍ରତିଷ୍ଠା)
+     POET PROFILE & WORKS VIEW (DETAILED VIEW)
+     Pulls upadhi, pradatakari, prasiddha_pustaka, puraskara,
+     likhana_shaili, edition, established_date and all works
      ========================================================= */
   function openPoetWorks(poetId){
     state.currentPoetId = poetId;
@@ -297,9 +456,13 @@
     if (!p) return;
 
     $('#worksPoetName').textContent = p.name;
-    $('#worksCount').textContent = `#${toOdia(p.num)} · ${p.title} · ${toOdia(p.works ? p.works.length : 0)} ଟି କୃତି`;
+    $('#worksCount').textContent = `#${toOdia(p.num)} · ${p.upadhi || p.title} · ${toOdia(p.works ? p.works.length : 0)} ଟି କୃତି`;
 
     const wrap = $('#worksList');
+    const awardsList = Array.isArray(p.puraskara || p.awards)
+      ? (p.puraskara || p.awards)
+      : [p.puraskara || p.awards].filter(Boolean);
+
     wrap.innerHTML = `
       <!-- 1. POET HERO CARD -->
       <div class="card" style="display:flex;gap:14px;align-items:center;margin-bottom:14px">
@@ -308,35 +471,35 @@
         </div>
         <div style="flex:1;min-width:0">
           <div style="font-size:18px;font-weight:700;color:var(--primary)">
-            #${toOdia(p.num)} ${esc(p.name)} <span class="ptitle-tag">${esc(p.title)}</span>
+            #${toOdia(p.num)} ${esc(p.name)} <span class="ptitle-tag">${esc(p.upadhi || p.title)}</span>
           </div>
           <div style="font-size:12px;color:var(--muted);margin-top:2px">${esc(p.eng_name || '')} · ${esc(p.era)}</div>
         </div>
       </div>
 
-      <!-- 2. UPADHI & PROVIDER BOX -->
+      <!-- 2. UPADHI & PRADATAKARI (FIELD 1 & 2) -->
       <div class="profile-feature-box" style="border-left:4.5px solid var(--primary)">
         <div class="pf-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-          ପ୍ରମୁଖ ଉପାଧି ଓ ଏହା କିଏ ପ୍ରଦାନ କରିଥିଲେ ?
+          ପ୍ରମୁଖ ଉପାଧି (Upadhi) ଓ ଉପାଧି ପ୍ରଦାନକାରୀ (Pradatakari)
         </div>
         <div style="font-size:15px;font-weight:700;color:var(--primary);margin-bottom:5px">
-          ${esc(p.titles || p.title)}
+          🎖️ ଉପାଧି: ${esc(p.upadhi || p.titles || p.title)}
         </div>
         <div class="pf-value">
-          <b style="color:var(--accent)">ଉପାଧି ପ୍ରଦାନକାରୀ:</b> ${esc(p.title_provider || 'ଓଡ଼ିଶାର ସାରସ୍ୱତ ସମାଜ')}
+          <b style="color:var(--accent)">ଉପାଧି ପ୍ରଦାନକାରୀ:</b> ${esc(p.pradatakari || p.title_provider || 'ଓଡ଼ିଶାର ସାରସ୍ୱତ ସମାଜ')}
         </div>
       </div>
 
-      <!-- 3. FAMOUS BOOK BOX -->
-      ${p.famous_book ? `
+      <!-- 3. PRASIDDHA PUSTAKA (FIELD 3) -->
+      ${(p.prasiddha_pustaka || p.famous_book) ? `
         <div class="profile-feature-box" style="border-left:4.5px solid var(--gold)">
           <div class="pf-title" style="color:var(--gold)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M4 19.5V6a2 2 0 0 1 2-2h11.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M20 17V4.5A1.5 1.5 0 0 0 18.5 3H6.5A2.5 2.5 0 0 0 4 5.5"/></svg>
-            ପ୍ରସିଦ୍ଧ ପୁସ୍ତକ / ଶ୍ରେଷ୍ଠ କାଳଜୟୀ ଗ୍ରନ୍ଥ
+            ପ୍ରସିଦ୍ଧ ପୁସ୍ତକ / ଶ୍ରେଷ୍ଠ କାଳଜୟୀ ଗ୍ରନ୍ଥ (Prasiddha Pustaka)
           </div>
           <div style="font-size:15.5px;font-weight:700;color:var(--text)">
-            ${esc(p.famous_book)}
+            📖 ${esc(p.prasiddha_pustaka || p.famous_book)}
           </div>
         </div>
       ` : ''}
@@ -353,28 +516,28 @@
         </div>
       </div>
 
-      <!-- 5. WRITING STYLE BOX -->
-      ${p.style ? `
+      <!-- 5. LIKHANA SHAILI (FIELD 5) -->
+      ${(p.likhana_shaili || p.style) ? `
         <div class="profile-feature-box" style="border-left:4.5px solid var(--accent)">
           <div class="pf-title" style="color:var(--accent)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            ଲେଖନ ଶୈଳୀ ଓ ସାହିତ୍ୟିକ ବୈଶିଷ୍ଟ୍ୟ (Writing Style)
+            ଲେଖନ ଶୈଳୀ ଓ ସାହିତ୍ୟିକ ବୈଶିଷ୍ଟ୍ୟ (Likhana Shaili / Writing Style)
           </div>
           <div class="pf-value">
-            ${esc(p.style)}
+            ✍️ ${esc(p.likhana_shaili || p.style)}
           </div>
         </div>
       ` : ''}
 
-      <!-- 6. AWARDS BOX -->
-      ${p.awards ? `
+      <!-- 6. PURASKARA (FIELD 4) -->
+      ${awardsList.length ? `
         <div class="profile-feature-box" style="border-left:4.5px solid #C4541E">
           <div class="pf-title" style="color:#C4541E">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            ପୁରସ୍କାର ଓ ସମ୍ମାନାବଳୀ (Awards & Honours)
+            ପୁରସ୍କାର ଓ ସମ୍ମାନାବଳୀ (Puraskara / Awards)
           </div>
           <div class="pf-value">
-            ${Array.isArray(p.awards) ? p.awards.map(a => `<div>• ${esc(a)}</div>`).join('') : esc(p.awards)}
+            ${awardsList.map(a => `<div>🎖️ ${esc(a)}</div>`).join('')}
           </div>
         </div>
       ` : ''}
@@ -817,13 +980,13 @@
     if (searchIndex) return searchIndex;
     const idx = [];
     DB.poets.forEach(p => {
-      const awardsStr = Array.isArray(p.awards) ? p.awards.join(' ') : (p.awards || '');
-      const bioText = `${p.num || ''} ${p.name} ${p.eng_name || ''} ${p.title} ${p.title_provider || ''} ${p.famous_book || ''} ${p.edition || ''} ${p.established_date || ''} ${p.style || ''} ${p.era} ${p.birth || p.birthplace || ''} ${p.parents || ''} ${p.titles || ''} ${awardsStr} ${p.bio || ''} ${(p.all_books || []).join(' ')}`;
+      const awardsStr = Array.isArray(p.puraskara || p.awards) ? (p.puraskara || p.awards).join(' ') : (p.puraskara || p.awards || '');
+      const bioText = `${p.num || ''} ${p.name} ${p.eng_name || ''} ${p.upadhi || ''} ${p.title || ''} ${p.titles || ''} ${p.pradatakari || ''} ${p.title_provider || ''} ${p.prasiddha_pustaka || ''} ${p.famous_book || ''} ${p.likhana_shaili || ''} ${p.style || ''} ${p.edition || ''} ${p.established_date || ''} ${p.era || ''} ${p.birth || p.birthplace || ''} ${p.parents || ''} ${awardsStr} ${p.bio || ''} ${(p.all_books || []).join(' ')}`;
       idx.push({
         type: 'poet',
         poetId: p.id,
         title: `#${toOdia(p.num)} ${p.name}`,
-        meta: `${p.title} · ${p.era} ${p.famous_book ? '· 📖 ' + p.famous_book : ''} ${p.edition ? '· 📚 ' + p.edition : ''}`,
+        meta: `${p.upadhi || p.title} · ${p.era} ${(p.prasiddha_pustaka || p.famous_book) ? '· 📖 ' + (p.prasiddha_pustaka || p.famous_book) : ''} ${p.edition ? '· 📚 ' + p.edition : ''}`,
         text: bioText,
         lower: bioText.toLowerCase()
       });
@@ -905,7 +1068,7 @@
         const wid = el.dataset.work;
         const vi = el.dataset.verse ? +el.dataset.verse : 0;
         if (type === 'poet'){
-          openPoetWorks(pid);
+          openPoetProfileModal(pid);
         } else if (type === 'work'){
           openWorkDetail(pid, wid);
         } else {
@@ -1231,6 +1394,22 @@
           openReader(state.currentPoetId, state.currentWorkId, state.currentVerseIdx);
         }
       };
+    });
+
+    // Profile Modal Listeners
+    const modalCloseBtn = $('#modalCloseBtn');
+    if (modalCloseBtn) modalCloseBtn.onclick = closePoetProfileModal;
+    const modalCloseActionBtn = $('#modalCloseActionBtn');
+    if (modalCloseActionBtn) modalCloseActionBtn.onclick = closePoetProfileModal;
+    const modalBackdrop = $('#profileModalBackdrop');
+    if (modalBackdrop) modalBackdrop.onclick = closePoetProfileModal;
+
+    // Global Escape Key Listener (Modal & Sheets)
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape'){
+        closePoetProfileModal();
+        closeSheet();
+      }
     });
 
     const resetBtn = $('#resetAll');

@@ -75,6 +75,18 @@
       if (!p.era) p.era = 'ଆଧୁନିକ କଥା ଓ ଯୁବ ପିଢ଼ି';
     }
 
+    // Normalize specific required fields for fast direct access
+    p.upadhi = p.upadhi || p.title || p.titles || 'ବିଶିଷ୍ଟ ସ୍ରଷ୍ଟା';
+    p.title = p.upadhi;
+    p.pradatakari = p.pradatakari || p.title_provider || 'ସାରସ୍ୱତ ସମାଜ ଓ ଓଡ଼ିଶାବାସୀ';
+    p.title_provider = p.pradatakari;
+    p.prasiddha_pustaka = p.prasiddha_pustaka || p.famous_book || (p.works && p.works[0] ? p.works[0].title : 'ମୁଖ୍ୟ କୃତି');
+    p.famous_book = p.prasiddha_pustaka;
+    p.likhana_shaili = p.likhana_shaili || p.style || 'ମନୋଜ୍ଞ ଓ ସାରଗର୍ଭକ ଶୈଳୀ';
+    p.style = p.likhana_shaili;
+    p.puraskara = p.puraskara || p.awards || ['ସାରସ୍ୱତ ସମ୍ମାନ'];
+    p.awards = p.puraskara;
+
     // Default edition and established date if missing
     if (!p.edition) p.edition = 'ପ୍ରାଚୀନ ତାଳପତ୍ର / ପ୍ରଥମ ମୁଦ୍ରଣ ସଂସ୍କରଣ';
     if (!p.established_date) p.established_date = p.period || p.era || 'ପ୍ରତିଷ୍ଠିତ ସମୟ';
